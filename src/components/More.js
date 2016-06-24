@@ -1,4 +1,5 @@
 import React from "react";
+import ReactDOM from "react-dom";
 import Menu from "react-menus";
 import Radium from "radium";
 import Button from "./Button";
@@ -33,10 +34,29 @@ export class More extends React.Component {
     super(props);
     this.state = {expanded: false};
   }
+
+  // https://discuss.reactjs.org/t/how-to-calculate-jqyery-closest-in-react/1988
+  componentDidMount() {
+    let app = document.getElementById('app');
+    app.addEventListener('click', this.handleDocumentClick.bind(this));
+  }
+
+  componentWillUnmount() {
+    let app = document.getElementById('app');
+    app.removeEventListener('click', this.handleDocumentClick.bind(this));
+  }
+
+  handleDocumentClick(evt) {
+    const area = ReactDOM.findDOMNode(this.refs.area);
+    if (!area.contains(evt.target)) {
+      this.setState({expanded: false});
+    }
+  }
+
   render() {
     return(
-      <span>
-          <Button kind="more" onClick={()=>{this.setState({expanded: true});}}>More</Button>
+      <span ref="area">
+          <Button kind="more" onClick={()=>{this.setState({expanded: !this.state.expanded});}}>More</Button>
           {this.state.expanded ? <Menu items={items} onClick={onClick}/> : null}
       </span>
     );
